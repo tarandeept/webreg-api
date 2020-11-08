@@ -80,7 +80,7 @@ def extract_course_info(tr) -> {'code', 'type', 'sec', 'units', ..., 'status'}:
     except:
         return dict()
 
-def add_course_info_to_course_dict(course_dict, course_info):
+def add_course_to_course_dict(course_dict, course_info):
     '''Gives a dict containing course info, adds the course info to the course_dict'''
     for k,v in course_info.items():
         print(f'Key: {k}   ---->{v}')
@@ -102,7 +102,7 @@ def construct_course_dict(course_dict, filename):
                 course_info = extract_course_info(course)
                 course_info['title'] = course_title
                 course_info['name'] = course_name
-                add_course_info_to_course_dict(course_dict, course_info)
+                add_course_to_course_dict(course_dict, course_info)
 
 if __name__ == '__main__':
     filename = 'html_files/compsci_2020_fall.html'

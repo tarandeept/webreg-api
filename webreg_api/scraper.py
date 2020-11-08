@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
+from datetime import datetime
 
 '''
 Example of tr containing course info
@@ -80,11 +81,45 @@ def extract_course_info(tr) -> {'code', 'type', 'sec', 'units', ..., 'status'}:
     except:
         return dict()
 
+def append_am_pm(time) -> str:
+    '''Adds either AM or PM to input time string'''
+    temp = time[-1].lower()
+    if temp == 'a':
+        time = time[0:-1] + 'AM'
+    elif temp == 'am':
+        time = time[0:-2] + 'AM'
+    elif temp == 'p':
+        time = time[0:-1] + 'PM'
+    elif temp == 'pm':
+        time = time[0:2] + 'PM'
+    else:
+        time = time + 'AM'
+    return time
+
+def extract_days(datetime) -> str:
+    ### REVISIT THIS FUNCTION AND CHANGE IT TO RETURN A LIST OF DIGITS [0,1,2,3,4,5,6]
+    '''Given a string in the format: TuTh   11:00-12:20p, returns TuTh'''
+    return datetime.split()[0].strip()
+
+def extract_start_end_time(str_time) -> {'start', 'end'}:
+    '''Given a string in the format: TuTh   11:00-12:20p, returns a dict
+    containing the start and end times as a Time object'''
+    result = dict()
+    str_time = str_time.split()[1].strip()
+    result['start'] = append_am_pm(str_time.split('-')[0])
+    result['end'] = append_am_pm(str_time.split('-')[1])
+    return result
+
 def add_course_to_course_dict(course_dict, course_info):
     '''Gives a dict containing course info, adds the course info to the course_dict'''
-    for k,v in course_info.items():
-        print(f'Key: {k}   ---->{v}')
-    exit()
+    keys = ['code', 'title', 'name', 'type', 'sec', 'units', 'instructor', 'days', 'start_time', 'end_time',
+            'place', 'final', 'max', 'enr', 'wl', 'req', 'rstr', 'textbooks', 'web', 'status']
+
+    code = course_info['code']
+    for key in keys:
+        course_dict[code][key] = course_info[key]
+
+    print(course_dict[34000])
 
 def construct_course_dict(course_dict, filename):
     '''Inserts course info into course_dict'''
@@ -100,11 +135,15 @@ def construct_course_dict(course_dict, filename):
                 course_name = title_info['name']
             elif is_course_info(course):
                 course_info = extract_course_info(course)
+                start_end_times = extract_start_end_time(course_info['time'])
                 course_info['title'] = course_title
                 course_info['name'] = course_name
-                add_course_to_course_dict(course_dict, course_info)
+                course_info['days'] = extract_days(course_info['time'])
+                course_info['start_time'] = start_end_times['start']
+                course_info['end_time'] = start_end_times['end']
+                # add_course_to_course_dict(course_dict, course_info)
 
 if __name__ == '__main__':
     filename = 'html_files/compsci_2020_fall.html'
-    course_dict = dict()
+    course_dict = defaultdict(dict)
     construct_course_dict(course_dict, filename)

@@ -80,21 +80,31 @@ def extract_course_info(tr) -> {'code', 'type', 'sec', 'units', ..., 'status'}:
     except:
         return dict()
 
-if __name__ == '__main__':
-    course_dict = dict()
+def add_course_info_to_course_dict(course_dict, course_info):
+    '''Gives a dict containing course info, adds the course info to the course_dict'''
+    for k,v in course_info.items():
+        print(f'Key: {k}   ---->{v}')
+    exit()
 
-    with open('html_files/compsci_2020_fall.html') as html_file:
+def construct_course_dict(course_dict, filename):
+    '''Inserts course info into course_dict'''
+    with open(filename) as html_file:
         soup = BeautifulSoup(html_file, 'lxml')
         courses = soup.find_all('tr', valign='top')
+        course_title = None
+        course_name = None
         for course in courses:
-            course_title = None
-            course_name = None
             if is_course_title(course):
                 title_info = extract_title_info(course)
                 course_title = title_info['title']
                 course_name = title_info['name']
             elif is_course_info(course):
                 course_info = extract_course_info(course)
-                for k,v in course_info.items():
-                    print(f'Key: {k}   ---->{v}')
-                # exit()
+                course_info['title'] = course_title
+                course_info['name'] = course_name
+                add_course_info_to_course_dict(course_dict, course_info)
+
+if __name__ == '__main__':
+    filename = 'html_files/compsci_2020_fall.html'
+    course_dict = dict()
+    construct_course_dict(course_dict, filename)

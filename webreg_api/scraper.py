@@ -106,8 +106,10 @@ def extract_start_end_time(str_time) -> {'start', 'end'}:
     containing the start and end times as a Time object'''
     result = dict()
     str_time = str_time.split()[1].strip()
-    result['start'] = append_am_pm(str_time.split('-')[0])
-    result['end'] = append_am_pm(str_time.split('-')[1])
+    str_start = append_am_pm(str_time.split('-')[0])
+    result['start'] = datetime.strptime(str_start, '%H:%M%p').time()
+    str_end = append_am_pm(str_time.split('-')[1])
+    result['end'] = datetime.strptime(str_end, '%H:%M%p').time()
     return result
 
 def add_course_to_course_dict(course_dict, course_info):

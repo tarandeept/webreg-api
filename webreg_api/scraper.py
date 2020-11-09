@@ -60,25 +60,17 @@ def extract_course_info(tr) -> {'code', 'type', 'sec', 'units', ..., 'status'}:
     except:
         return dict()
 
-def extract_start_end_time(str_time) -> {'start', 'end'}:
-    '''Given a string in the format: TuTh   11:00-12:20p, returns a dict
-    containing the start and end times as a Time object'''
-    result = dict()
-    time_range = extract_time_range(str_time)
-    result['start'] = extract_start(time_range)
-    result['end'] = extract_end(time_range)
-    return result
-
-def add_course_to_course_dict(course_dict, course_info):
-    '''Gives a dict containing course info, adds the course info to the course_dict'''
+def add_course_to_batch_params(batch_params, course_info):
+    '''Gives a dict containing course info, adds the course info to the batch_params list'''
     keys = ['code', 'title', 'name', 'type', 'sec', 'units', 'instructor', 'days', 'start_time', 'end_time',
             'place', 'final', 'max', 'enr', 'wl', 'req', 'rstr', 'textbooks', 'web', 'status']
-    code = course_info['code']
-    for key in keys:
-        course_dict[code][key] = course_info[key]
+    entry = [None] * len(keys)
+    for index, key in enumerate(keys):
+        entry[index] = course_info[key]
+    batch_params.append(entry)
 
-def construct_course_dict(course_dict, filename):
-    '''Inserts course info into course_dict'''
+def construct_batch_params(batch_params, filename):
+    '''Inserts course info into batch_params'''
     with open(filename) as html_file:
         soup = BeautifulSoup(html_file, 'lxml')
         courses = soup.find_all('tr', valign='top')
@@ -91,13 +83,21 @@ def construct_course_dict(course_dict, filename):
                 course_name = title_info['name']
             elif is_course_info(course):
                 course_info = extract_course_info(course)
-                start_end_times = extract_start_end_time(course_info['time'])
                 course_info['title'] = course_title
                 course_info['name'] = course_name
                 course_info['days'] = extract_days(course_info['time'])
-                course_info['start_time'] = start_end_times['start']
-                course_info['end_time'] = start_end_times['end']
-                add_course_to_course_dict(course_dict, course_info)
+                times = extract_start_end_times(course_info['time'])
+                course_info['start_time'] = times[0]
+                course_info['end_time'] = times[1]
+                add_course_to_batch_params(batch_params, course_info)
+
+def batch_insert_courses(batch_params, cursor):
+    '''Batch insers the courses into the DB'''
+    query = 'INSERT INTO 2020_fall_courses \
+            (code, title, name, type, sec, units, instructor, days, start_time, \
+            end_time, place, final, max, enr, wl, req, rstr, textbooks, web, status) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+    cursor.executemany(query, batch_params)
 
 if __name__ == '__main__':
     ### Setup MySQL connection to local db
@@ -112,5 +112,8 @@ if __name__ == '__main__':
                                 cursorclass=pymysql.cursors.DictCursor)
     cursor = connection.cursor()
     filename = 'html_files/compsci_2020_fall.html'
-    course_dict = defaultdict(dict)
-    construct_course_dict(course_dict, filename)
+    batch_params = []
+    construct_batch_params(batch_params, filename)
+    batch_insert_courses(batch_params, cursor)
+    connection.commit()
+    connection.close()

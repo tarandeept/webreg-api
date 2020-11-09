@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
 from utils import *
+import pymysql
 
 def is_course_title(tr) -> bool:
     '''Returns True if the tr contains the CourseTitle
@@ -99,6 +100,17 @@ def construct_course_dict(course_dict, filename):
                 add_course_to_course_dict(course_dict, course_info)
 
 if __name__ == '__main__':
+    ### Setup MySQL connection to local db
+    ### Need to eventually connect to DB hosted remotely
+    ### Need to eventually create config file so as to not expose password
+    ### Make sure to gitignore config file
+    connection = pymysql.connect(host='localhost',
+                                user='root',
+                                password='Shishkabobs',
+                                db='uci_webreg',
+                                charset='utf8mb4',
+                                cursorclass=pymysql.cursors.DictCursor)
+    cursor = connection.cursor()
     filename = 'html_files/compsci_2020_fall.html'
     course_dict = defaultdict(dict)
     construct_course_dict(course_dict, filename)

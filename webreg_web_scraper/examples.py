@@ -1,0 +1,21 @@
+'''
+Example of tr containing course info
+<tr valign="top" bgcolor="#FFFFCC">
+    <td bgcolor="#D5E5FF"  nowrap="nowrap">34000</td>
+    <td  nowrap="nowrap">Lec</td>
+    <td bgcolor="#D5E5FF"  nowrap="nowrap">A</td>
+    <td  nowrap="nowrap">4</td>
+    <td bgcolor="#D5E5FF"  nowrap="nowrap">ZHAO, S.</td>
+    <td  nowrap="nowrap">TuTh &nbsp; 11:00-12:20p</td>
+    <td bgcolor="#D5E5FF"  nowrap="nowrap">VRTL REMOTE</td>
+    <td  nowrap="nowrap">Tue, Dec 15, 10:30-12:30pm</td>
+    <td bgcolor="#D5E5FF" align="right" nowrap="nowrap">150</td>
+    <td align="right" nowrap="nowrap">128</td>
+    <td bgcolor="#D5E5FF" align="right" nowrap="nowrap">n/a</td>
+    <td align="right" nowrap="nowrap">259</td>
+    <td bgcolor="#D5E5FF"  nowrap="nowrap">A</td>
+    <td  nowrap="nowrap"><a href="http://uci.bncollege.com"  target="_blank">Bookstore</a></td>
+    <td bgcolor="#D5E5FF"  nowrap="nowrap">&nbsp;</td>
+    <td  nowrap="nowrap"><b><font color="green">OPEN</font></b></td>
+</tr>
+'''

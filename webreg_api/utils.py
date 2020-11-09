@@ -35,7 +35,7 @@ def extract_start_end_times(str_time) -> []:
             start = start + timedelta(hours = 12)
         return [start.time(), end.time()]
     except:
-        return [start, end]
+        return [None, None]
 
 def extract_start_time(str_time):
     '''Returns a Time object representing the start time. If time is TBA, returns TBA'''

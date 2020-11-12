@@ -1,7 +1,9 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
+from configparser import ConfigParser
 from utils import *
 import pymysql
+import sys
 
 def is_course_title(tr) -> bool:
     '''Returns True if the tr contains the CourseTitle
@@ -99,19 +101,27 @@ def batch_insert_courses(batch_params, cursor):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     cursor.executemany(query, batch_params)
 
-if __name__ == '__main__':
-    ### Setup MySQL connection to local db
-    ### Need to eventually connect to DB hosted remotely
-    ### Need to eventually create config file so as to not expose password
-    ### Make sure to gitignore config file
-    connection = pymysql.connect(host='localhost',
-                                user='root',
-                                password='Shishkabobs',
-                                db='uci_webreg',
+def setup_database_connection(config_file):
+    '''Sets up the MySQL database connection and returns the connection'''
+    config = ConfigParser()
+    config.read(config_file)
+    host = config['database']['host']
+    user = config['database']['user']
+    password = config['database']['password']
+    db = config['database']['db']
+    connection = pymysql.connect(host=host,
+                                user=user,
+                                password=password,
+                                db=db,
                                 charset='utf8mb4',
                                 cursorclass=pymysql.cursors.DictCursor)
+    return connection
+
+if __name__ == '__main__':
+    filename = sys.argv[1] ### This is the filename for the webpage we are scraping
+    config_file = '../config.ini'
+    connection = setup_database_connection(config_file)
     cursor = connection.cursor()
-    filename = 'html_files/compsci_2020_fall.html'
     batch_params = []
     construct_batch_params(batch_params, filename)
     batch_insert_courses(batch_params, cursor)

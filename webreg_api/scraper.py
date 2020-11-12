@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
 from configparser import ConfigParser
-from utils import *
+import utils
 import pymysql
 import sys
 
@@ -87,8 +87,8 @@ def construct_batch_params(batch_params, filename):
                 course_info = extract_course_info(course)
                 course_info['title'] = course_title
                 course_info['name'] = course_name
-                course_info['days'] = extract_days(course_info['time'])
-                times = extract_start_end_times(course_info['time'])
+                course_info['days'] = utils.extract_days(course_info['time'])
+                times = utils.extract_start_end_times(course_info['time'])
                 course_info['start_time'] = times[0]
                 course_info['end_time'] = times[1]
                 add_course_to_batch_params(batch_params, course_info)

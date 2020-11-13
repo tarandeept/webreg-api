@@ -34,7 +34,7 @@ def extract_title_info(tr) -> {'title', 'name'}:
 def is_course_info(tr) -> bool:
     '''Returns True if the tr contains course info such as course code etc.'''
     tds = tr.find_all('td')
-    return len(tds) == 16
+    return len(tds) == 17  ## This number may be different depending on the quarter
 
 def extract_info(td, key) -> str:
     '''Returns the info for the given td'''
@@ -93,9 +93,9 @@ def construct_batch_params(batch_params, filename):
                 course_info['end_time'] = times[1]
                 add_course_to_batch_params(batch_params, course_info)
 
-def batch_insert_courses(batch_params, cursor):
+def batch_insert_courses(batch_params, cursor, table_name):
     '''Batch insers the courses into the DB'''
-    query = 'INSERT INTO 2020_fall_courses \
+    query = f'INSERT INTO {table_name} \
             (code, title, name, type, sec, units, instructor, days, start_time, \
             end_time, place, final, max, enr, wl, req, rstr, textbooks, web, status) \
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
@@ -118,12 +118,24 @@ def setup_database_connection(config_file):
     return connection
 
 if __name__ == '__main__':
-    filename = 'html_files/' + sys.argv[1] ### Filename of the webpage we're scraping
+    ### Database setup
     config_file = '../config.ini'
     connection = setup_database_connection(config_file)
     cursor = connection.cursor()
+
+    ### File setup
+    year = sys.argv[1]
+    quarter = sys.argv[2]
+    filename = sys.argv[3]
+    file = 'html_files/' + sys.argv[1]
+    file = f'html_files/{year}/{quarter}/{filename}'
+
+    ### Web scraping
     batch_params = []
-    construct_batch_params(batch_params, filename)
-    batch_insert_courses(batch_params, cursor)
+    construct_batch_params(batch_params, file)
+
+    ### Inserting courses into database
+    table_name = f'{year}_{quarter}_courses'
+    batch_insert_courses(batch_params, cursor, table_name)
     connection.commit()
     connection.close()

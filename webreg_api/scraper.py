@@ -118,7 +118,7 @@ def setup_database_connection(config_file):
     return connection
 
 if __name__ == '__main__':
-    filename = sys.argv[1] ### This is the filename for the webpage we are scraping
+    filename = 'html_files/' + sys.argv[1] ### Filename of the webpage we're scraping
     config_file = '../config.ini'
     connection = setup_database_connection(config_file)
     cursor = connection.cursor()

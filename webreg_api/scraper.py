@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
-from configparser import ConfigParser
-import utils
+import utils, database
 import pymysql
 import sys
 
@@ -100,22 +99,6 @@ def batch_insert_courses(batch_params, cursor, table_name):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     cursor.executemany(query, batch_params)
 
-def setup_database_connection(config_file):
-    '''Sets up the MySQL database connection and returns the connection'''
-    config = ConfigParser()
-    config.read(config_file)
-    host = config['database']['host']
-    user = config['database']['user']
-    password = config['database']['password']
-    db = config['database']['db']
-    connection = pymysql.connect(host=host,
-                                user=user,
-                                password=password,
-                                db=db,
-                                charset='utf8mb4',
-                                cursorclass=pymysql.cursors.DictCursor)
-    return connection
-
 def find_course_count(filename):
     '''Finds how many courses are on the webpage'''
     with open(filename) as html_file:
@@ -131,7 +114,7 @@ if __name__ == '__main__':
 
     ### Database setup
     config_file = '../config.ini'
-    connection = setup_database_connection(config_file)
+    connection = database.setup_database_connection(config_file)
     cursor = connection.cursor()
 
     ### File setup

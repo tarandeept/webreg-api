@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
-import database
+import database, api_utils
 import pymysql
+from datetime import datetime
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,27 +17,28 @@ config_file = '../config.ini'
 connection = database.setup_database_connection(config_file)
 cursor = connection.cursor()
 
-def build_table_name(year, quarter):
-    return f'{year}_{quarter}_courses'
-
 # Course
-# Returns the Course object of the given course code
+# Returns course info of the given course code
 class Course(Resource):
     def get(self):
-        return {'Home': 'route'}
+        return {'Body': 'Welcome to Course Routes'}
 
     def post(self):
-        args = parser.parse_args()
-        code = int(args['code'])
-        year = args['year']
-        quarter = args['quarter']
-        table_name = build_table_name(year, quarter)
-        query = f'SELECT * FROM {table_name} WHERE code=%s'
-        cursor.execute(query, [code])
-        result = cursor.fetchone()
-        print(result)
-        return {'place': result['place']}
+        try:
+            args = parser.parse_args()
+            code = int(args['code'])
+            year = args['year']
+            quarter = args['quarter']
+            table_name = database.build_table_name(year, quarter)
+            query = f'SELECT * FROM {table_name} WHERE code=%s'
+            cursor.execute(query, [code])
+            sql_result = cursor.fetchone()
+            response = api_utils.build_response(sql_result)
+            return response
+        except:
+            return {'Error': 'Error in request'}, 500
 
+# API Routes
 api.add_resource(Course, '/')
 
 if __name__ == '__main__':

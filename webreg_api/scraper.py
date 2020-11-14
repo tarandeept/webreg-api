@@ -138,7 +138,7 @@ if __name__ == '__main__':
     print('Executing batch insertion')
 
     ### Inserting courses into database
-    table_name = f'{year}_{quarter}_courses'
+    table_name = database.build_table_name(year, quarter)
     batch_insert_courses(batch_params, cursor, table_name)
     connection.commit()
     connection.close()

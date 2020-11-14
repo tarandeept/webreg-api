@@ -33,7 +33,7 @@ def extract_start_end_times(str_time) -> []:
         minutes = diff.total_seconds() / 60
         if minutes > 300:
             start = start + timedelta(hours = 12)
-        return [start.time(), end.time()]
+        return [start.isoformat(), end.isoformat()]
     except:
         return [None, None]
 

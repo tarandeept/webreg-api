@@ -31,10 +31,10 @@ def extract_title_info(tr) -> {'title', 'name'}:
     except:
         return dict()
 
-def is_course_info(tr) -> bool:
+def is_course_info(tr, header_len) -> bool:
     '''Returns True if the tr contains course info such as course code etc.'''
     tds = tr.find_all('td')
-    return len(tds) == 17  ## This number may be different depending on the quarter
+    return len(tds) == header_len
 
 def extract_info(td, key) -> str:
     '''Returns the info for the given td'''
@@ -47,12 +47,10 @@ def extract_info(td, key) -> str:
     else:
         return td.text.strip()
 
-def extract_course_info(tr) -> {'code', 'type', 'sec', 'units', ..., 'status'}:
+def extract_course_info(tr, keys) -> {'code', 'type', 'sec', 'units', ..., 'status'}:
     '''Returns a dict containing course info of the given tr
     Returns empty dict if input is invalid'''
     result = dict()
-    keys = ['code', 'type', 'sec', 'units', 'instructor', 'time', 'place', 'final',
-            'max', 'enr', 'wl', 'req', 'rstr', 'textbooks', 'web', 'status']
     try:
         tds = tr.find_all('td')
         for index, key in enumerate(keys):
@@ -71,8 +69,9 @@ def add_course_to_batch_params(batch_params, course_info):
         entry[index] = course_info[key]
     batch_params.append(entry)
 
-def construct_batch_params(batch_params, filename):
+def construct_batch_params(batch_params, headers, filename):
     '''Inserts course info into batch_params'''
+    header_len = len(headers)
     with open(filename) as html_file:
         soup = BeautifulSoup(html_file, 'lxml')
         courses = soup.find_all('tr', valign='top')
@@ -83,8 +82,8 @@ def construct_batch_params(batch_params, filename):
                 title_info = extract_title_info(course)
                 course_title = title_info['title']
                 course_name = title_info['name']
-            elif is_course_info(course):
-                course_info = extract_course_info(course)
+            elif is_course_info(course, header_len):
+                course_info = extract_course_info(course, headers)
                 course_info['title'] = course_title
                 course_info['name'] = course_name
                 course_info['days'] = utils.extract_days(course_info['time'])
@@ -118,6 +117,10 @@ def setup_database_connection(config_file):
     return connection
 
 if __name__ == '__main__':
+    ### Constants (headers may need to be adjusted per quarter)
+    headers = ['code', 'type', 'sec', 'units', 'instructor', 'time', 'place', 'final',
+                'max', 'enr', 'wl', 'req', 'nor', 'rstr', 'textbooks', 'web', 'status']
+
     ### Database setup
     config_file = '../config.ini'
     connection = setup_database_connection(config_file)
@@ -132,7 +135,7 @@ if __name__ == '__main__':
 
     ### Web scraping
     batch_params = []
-    construct_batch_params(batch_params, file)
+    construct_batch_params(batch_params, headers, file)
 
     ### Inserting courses into database
     table_name = f'{year}_{quarter}_courses'

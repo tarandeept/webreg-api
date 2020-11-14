@@ -116,6 +116,14 @@ def setup_database_connection(config_file):
                                 cursorclass=pymysql.cursors.DictCursor)
     return connection
 
+def find_course_count(filename):
+    '''Finds how many courses are on the webpage'''
+    with open(filename) as html_file:
+        soup = BeautifulSoup(html_file, 'lxml')
+        course_summary = soup.find('dl', class_='course-summary')
+        count = course_summary.find('dt').text.split()[-1].strip()
+        return int(count)
+
 if __name__ == '__main__':
     ### Constants (headers may need to be adjusted per quarter)
     headers = ['code', 'type', 'sec', 'units', 'instructor', 'time', 'place', 'final',
@@ -136,6 +144,15 @@ if __name__ == '__main__':
     ### Web scraping
     batch_params = []
     construct_batch_params(batch_params, headers, file)
+
+    ### Metric tracking
+    total_scraped_courses = len(batch_params)
+    actual_course_count = find_course_count(file)
+    print('---------------------------------------------------')
+    print(f'Filename: ', file)
+    print(f'Total Scraped Courses: {total_scraped_courses}')
+    print(f'Actual course count: {actual_course_count}')
+    print('Executing batch insertion')
 
     ### Inserting courses into database
     table_name = f'{year}_{quarter}_courses'

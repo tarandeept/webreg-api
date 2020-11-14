@@ -16,3 +16,6 @@ def setup_database_connection(config_file):
                                 charset='utf8mb4',
                                 cursorclass=pymysql.cursors.DictCursor)
     return connection
+
+def build_table_name(year, quarter):
+    return f'{year}_{quarter}_courses'

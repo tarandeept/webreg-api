@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
-import database, api_utils
+from webreg_api import database, api_utils
 import pymysql
 from datetime import datetime
 

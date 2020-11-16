@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
-import utils, database
+from webreg_api import database, utils
 import pymysql
 import sys
 

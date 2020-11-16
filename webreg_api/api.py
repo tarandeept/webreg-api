@@ -35,7 +35,8 @@ class Course(Resource):
             sql_result = cursor.fetchone()
             response = api_utils.build_response(sql_result)
             return response
-        except:
+        except Exception as e:
+            print(e)
             return {'body': 'Error in request'}, 500
 
 # API Routes

@@ -14,8 +14,7 @@ parser.add_argument('year')
 parser.add_argument('quarter')
 
 # Database setup
-config_file = '../config.ini'
-connection = database.setup_database_connection(config_file)
+connection = database.setup_database_connection()
 cursor = connection.cursor()
 
 # Course

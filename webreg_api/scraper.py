@@ -114,8 +114,7 @@ if __name__ == '__main__':
                 'max', 'enr', 'wl', 'req', 'nor', 'rstr', 'textbooks', 'web', 'status']
 
     ### Database setup
-    config_file = '../config.ini'
-    connection = database.setup_database_connection(config_file)
+    connection = database.setup_database_connection()
     cursor = connection.cursor()
 
     ### File setup

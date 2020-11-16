@@ -21,7 +21,7 @@ cursor = connection.cursor()
 # Returns course info of the given course code
 class Course(Resource):
     def get(self):
-        return {'Body': 'Welcome to Course Routes'}
+        return {'body': 'Welcome to Course Routes'}
 
     def post(self):
         try:
@@ -36,10 +36,10 @@ class Course(Resource):
             response = api_utils.build_response(sql_result)
             return response
         except:
-            return {'Error': 'Error in request'}, 500
+            return {'body': 'Error in request'}, 500
 
 # API Routes
 api.add_resource(Course, '/')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

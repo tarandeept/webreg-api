@@ -4,8 +4,11 @@ the upcoming 2021 Winter Quarter.
 
 Endpoints:
 Get course info
-POST
-Need to enter more info here once app is deployed
+POST https://webreg-api.herokuapp.com/
+Body:
+- "code" (Integer representing the course code)
+- "year" (Integer representing the year of the course)
+- "quarter" (String {"fall", "winter", or "spring"})
 
 How this API works:
 This application has 3 main components

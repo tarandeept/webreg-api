@@ -25,7 +25,6 @@ class Course(Resource):
 
     def post(self):
         try:
-            print('HERE')
             args = parser.parse_args()
             code = int(args['code'])
             year = args['year']

@@ -1,1 +1,1 @@
-web: gunicorn app:webreg_api/api
+web: gunicorn webreg_api/api:app

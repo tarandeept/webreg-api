@@ -25,6 +25,7 @@ class Course(Resource):
 
     def post(self):
         try:
+            print('HERE')
             args = parser.parse_args()
             code = int(args['code'])
             year = args['year']
@@ -35,8 +36,7 @@ class Course(Resource):
             sql_result = cursor.fetchone()
             response = api_utils.build_response(sql_result)
             return response
-        except Exception as e:
-            print(e)
+        except:
             return {'body': 'Error in request'}, 500
 
 # API Routes

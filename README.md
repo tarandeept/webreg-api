@@ -42,3 +42,8 @@ Here is a complete list of files stored locally:
 2. Config files
 3. Instructions.txt (explains how to access certain server resources)
 4. venv (virtual environment)
+
+Known Bugs:
+- Instructor field has STAFF appended to the beginning of many instructors names
+- This is a bug that exists within scraper.py
+- The HTML parsing of the instructor field needs to be adjusted to account for STAFF

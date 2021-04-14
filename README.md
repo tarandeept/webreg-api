@@ -33,3 +33,5 @@ Known Bugs:
 - Instructor field has STAFF appended to the beginning of many instructors names
 - This is a bug that exists within scraper.py
 - The HTML parsing of the instructor field needs to be adjusted to account for STAFF
+
+Note: This project is no longer being maintained. The API endpoint is no longer running.

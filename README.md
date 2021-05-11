@@ -28,10 +28,3 @@ For example 2021 Winter Quarter the headers used are (17 total)
 Web, Status)
 Fall 2020 however only used 16 headers (all the same besides for Nor)
 - So because of this, each quarter the scraper.py needs to be adjusted to use the correct headers
-
-Known Bugs:
-- Instructor field has STAFF appended to the beginning of many instructors names
-- This is a bug that exists within scraper.py
-- The HTML parsing of the instructor field needs to be adjusted to account for STAFF
-
-Note: This project is no longer being maintained. The API endpoint is no longer running.

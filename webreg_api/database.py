@@ -17,7 +17,7 @@ def setup_database_connection():
         db = os.getenv('DB_DB')
     else:
         config = ConfigParser()
-        config.read('../config.ini')
+        config.read('config.ini')
         host = config['database']['host']
         user = config['database']['user']
         password = config['database']['password']

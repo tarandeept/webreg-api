@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restful import Resource, Api
-from webreg_api import database, api_utils
-# import database, api_utils
+# from webreg_api import database, api_utils
+import database, api_utils
 import pymysql
 from datetime import datetime
 
@@ -27,4 +27,4 @@ class Course(Resource):
 api.add_resource(Course, '/api/course/<int:code>/<int:year>/<string:quarter>')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

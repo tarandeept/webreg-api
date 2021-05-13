@@ -121,8 +121,9 @@ if __name__ == '__main__':
     year = sys.argv[1]
     quarter = sys.argv[2]
     filename = sys.argv[3]
-    file = 'html_files/' + sys.argv[1]
     file = f'html_files/{year}/{quarter}/{filename}'
+
+    ### Create table if it doesn't exist
 
     ### Web scraping
     batch_params = []

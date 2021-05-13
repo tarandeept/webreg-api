@@ -1,7 +1,7 @@
 """
 This module is a wrapper for scraper.py
 It is responsible for automatically running scraper.py 
-for each major specified on the UCI course page.
+for each department specified on the UCI webreg page.
 
 UCI Webreg Base Form URL
 https://www.reg.uci.edu/perl/WebSoc/?YearTerm=2021-92&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept=COMPSCI&CourseNum=&Division=ANY&CourseCodes=&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room=&Submit=Display+Web+Results

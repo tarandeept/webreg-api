@@ -64,17 +64,10 @@ def get_dept_courses(dept):
 def get_course_files_and_save():
     base_path = os.getcwd() + f'/webreg_api/html_files/{CURRENT_YEAR}/{CURRENT_QTR}'
     for dept in DEPTS:
-        file_path = base_path + f'/{dept}/{dept}.html'
+        file_path = base_path + f'/{dept}.html'
         with open(file_path, 'w') as file:
             html = get_dept_courses(dept)
             file.write(html)
-
-def create_dept_directories():
-    base_path = os.getcwd() + f'/webreg_api/html_files/{CURRENT_YEAR}/{CURRENT_QTR}'
-    for dept in DEPTS:
-        dept_path = base_path + f'/{dept}'
-        if not os.path.exists(dept_path):
-            os.mkdir(dept_path)
 
 def create_year_quarter_directory():
     year_path = os.getcwd() + f'/webreg_api/html_files/{CURRENT_YEAR}'
@@ -89,5 +82,4 @@ def create_year_quarter_directory():
 
 if __name__ == '__main__':
     create_year_quarter_directory()
-    create_dept_directories()
     get_course_files_and_save()

@@ -1,9 +1,18 @@
+"""
+This module is the main scraper module
+It needs the year, quarter, and filepath of the file it scrapes
+It extracts course information from the file and stores it in DB
+"""
+
+HEADERS = ['code', 'type', 'sec', 'units', 'instructor', 'time', 'place', 'final',
+            'max', 'enr', 'wl', 'req', 'nor', 'rstr', 'textbooks', 'web', 'status']
+
+
 from bs4 import BeautifulSoup
 from collections import defaultdict
 # from webreg_api import database, utils
 import database, utils
 import pymysql
-import sys
 
 def is_course_title(tr) -> bool:
     '''Returns True if the tr contains the CourseTitle
@@ -63,82 +72,71 @@ def extract_course_info(tr, keys) -> {'code', 'type', 'sec', 'units', ..., 'stat
 def add_course_to_batch_params(batch_params, course_info):
     '''Gives a dict containing course info, adds the course info to the batch_params list'''
     keys = ['code', 'title', 'name', 'type', 'sec', 'units', 'instructor', 'days', 'start_time', 'end_time',
-            'place', 'final', 'max', 'enr', 'wl', 'req', 'rstr', 'textbooks', 'web', 'status']
+            'place', 'final', 'max', 'enr', 'wl', 'req', 'rstr', 'textbooks', 'web', 'status', 'dept']
     entry = [None] * len(keys)
     for index, key in enumerate(keys):
         entry[index] = course_info[key]
     batch_params.append(entry)
 
-def construct_batch_params(batch_params, headers, filename):
+def construct_batch_params(batch_params, html, dept):
     '''Inserts course info into batch_params'''
-    header_len = len(headers)
-    with open(filename) as html_file:
-        soup = BeautifulSoup(html_file, 'lxml')
-        courses = soup.find_all('tr', valign='top')
-        course_title = None
-        course_name = None
-        for course in courses:
-            if is_course_title(course):
-                title_info = extract_title_info(course)
-                course_title = title_info['title']
-                course_name = title_info['name']
-            elif is_course_info(course, header_len):
-                course_info = extract_course_info(course, headers)
-                course_info['title'] = course_title
-                course_info['name'] = course_name
-                course_info['days'] = utils.extract_days(course_info['time'])
-                times = utils.extract_start_end_times(course_info['time'])
-                course_info['start_time'] = times[0]
-                course_info['end_time'] = times[1]
-                add_course_to_batch_params(batch_params, course_info)
+    header_len = len(HEADERS)
+    soup = BeautifulSoup(html, 'lxml')
+    courses = soup.find_all('tr', valign='top')
+    course_title = None
+    course_name = None
+    for course in courses:
+        if is_course_title(course):
+            title_info = extract_title_info(course)
+            course_title = title_info['title']
+            course_name = title_info['name']
+        elif is_course_info(course, header_len):
+            course_info = extract_course_info(course, HEADERS)
+            course_info['title'] = course_title
+            course_info['name'] = course_name
+            course_info['days'] = utils.extract_days(course_info['time'])
+            times = utils.extract_start_end_times(course_info['time'])
+            course_info['start_time'] = times[0]
+            course_info['end_time'] = times[1]
+            course_info['dept'] = dept
+            add_course_to_batch_params(batch_params, course_info)
 
 def batch_insert_courses(batch_params, cursor, table_name):
     '''Batch insers the courses into the DB'''
     query = f'INSERT INTO {table_name} \
             (code, title, name, type, sec, units, instructor, days, start_time, \
-            end_time, place, final, max, enr, wl, req, rstr, textbooks, web, status) \
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+            end_time, place, final, max, enr, wl, req, rstr, textbooks, web, status, dept) \
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     cursor.executemany(query, batch_params)
 
-def find_course_count(filename):
+def find_course_count(html):
     '''Finds how many courses are on the webpage'''
-    with open(filename) as html_file:
-        soup = BeautifulSoup(html_file, 'lxml')
-        course_summary = soup.find('dl', class_='course-summary')
-        count = course_summary.find('dt').text.split()[-1].strip()
-        return int(count)
+    soup = BeautifulSoup(html, 'lxml')
+    course_summary = soup.find('dl', class_='course-summary')
+    count = course_summary.find('dt').text.split()[-1].strip()
+    return int(count)
 
-if __name__ == '__main__':
-    ### Constants (headers may need to be adjusted per quarter)
-    headers = ['code', 'type', 'sec', 'units', 'instructor', 'time', 'place', 'final',
-                'max', 'enr', 'wl', 'req', 'nor', 'rstr', 'textbooks', 'web', 'status']
+def log_metrics(course_count, dept):
+    print('---------------------------------------------------')
+    print(f'Department: ', dept)
+    print(f'Total Scraped Courses: {course_count}')
+    print()
 
+def run_scraper(year, quarter, html, dept):
+    '''Main function that runs the scraper'''
     ### Database setup
     connection = database.setup_database_connection()
     cursor = connection.cursor()
 
-    ### File setup
-    year = sys.argv[1]
-    quarter = sys.argv[2]
-    filename = sys.argv[3]
-    file = f'html_files/{year}/{quarter}/{filename}'
-
-    ### Create table if it doesn't exist
-
-    ### Web scraping
+    ### Scrape file
     batch_params = []
-    construct_batch_params(batch_params, headers, file)
+    construct_batch_params(batch_params, html, dept)
 
-    ### Metric tracking
+    ### Track metrics
     total_scraped_courses = len(batch_params)
-    actual_course_count = find_course_count(file)
-    print('---------------------------------------------------')
-    print(f'Filename: ', file)
-    print(f'Total Scraped Courses: {total_scraped_courses}')
-    print(f'Actual course count: {actual_course_count}')
-    print('Executing batch insertion')
+    log_metrics(total_scraped_courses, dept)
 
-    ### Inserting courses into database
+    ### Batch insert course info into DB
     table_name = database.build_table_name(year, quarter)
     batch_insert_courses(batch_params, cursor, table_name)
     connection.commit()

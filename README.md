@@ -1,30 +1,60 @@
-Webreg API is an API that provides course info for courses available at UCI.
-Currently this API can only return info for courses that will be available for
-the upcoming 2021 Winter Quarter.
+# UCI Webreg API
+> A public API that serves information about courses currently being offered at UCI
 
-Endpoints:
-Get course info
-POST https://webreg-api.herokuapp.com/
-Body:
-- "code" (Integer representing the course code)
-- "year" (Integer representing the year of the course)
-- "quarter" (String {"fall", "winter", or "spring"})
+## Table of Contents
+1. [Usage](#Usage)
+    1. [Routes](#Routes)
+    2. [Limitations](#limitations)
+2. [Development](#development)
+    1. [Install Dependencies](#development)
+    2. [Run the Scraper](#development)
+    3. [Run the API](#development)
+3. [Contributing](#contributing)
 
-How this API works:
-This application has 3 main components
-1. Course webscraper to gather course info
-2. MySQL database to store course info
-3. Flask API to serve course info
+## Usage
+> The API is deployed on Heroku at https://uci-webreg-api.herokuapp.com
 
-Web Scraper:
-To run the webscraper
-python scraper.py [year] [quarter] [filename]
-python scraper.py 2021 winter compsci.html
+### Routes
+  - GET `/api/course/:id/:year/:quarter`
+  - Example: `/api/course/34000/2021/fall`
+    - Returns the course by the given `id`, `year`, and `quarter`
+  - GET `/api/dept/:dept/:year/:quarter`
+  - Example: `/api/dept/COMPSCI/2021/fall`
+    - Returns all courses by the given `dept`, `year`, and `quarter`
 
-Important Notes:
-- Each quarter the UCI webreg uses 1 or 2 different headers to describe courses
-For example 2021 Winter Quarter the headers used are (17 total)
-(Code, Type, Sec, Units, Instructor, Time, Place, Final, Max, Enr, Wl, Req, Nor, Rstr, Textbooks,
-Web, Status)
-Fall 2020 however only used 16 headers (all the same besides for Nor)
-- So because of this, each quarter the scraper.py needs to be adjusted to use the correct headers
+### Limitations
+  - The API currently only supports requests for courses being offered in the upcoming Fall, 2021 Quarter.
+
+## Development
+1. Install Dependencies
+    - Easy mode (might clash with current depends)
+        ```sh
+        pip install -r requirements.txt
+        ```
+    - Prefered Method (venv)
+        ```sh
+        python3 -m venv venv
+      
+        source venv/bin/activate
+    
+        pip install -r requirements.txt
+        ```
+
+2. Run the Scraper
+    - From root directory 
+        ```sh
+        python webreg_api/scraper_wrapper.py
+        ```
+
+3. Run the API
+    - From root directory
+        ```sh
+        python webreg_api/api.py
+        ```
+
+## Contributing
+1. Fork it (<https://github.com/tarandeept/webreg-api>)
+2. Create your feature branch (`git checkout -b feature/fooBar`)
+3. Commit your changes (`git commit -am 'Add some fooBar'`)
+4. Push to the branch (`git push origin feature/fooBar`)
+5. Create a new Pull Request

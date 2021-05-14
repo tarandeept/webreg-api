@@ -23,8 +23,20 @@ class Course(Resource):
         response = api_utils.build_response(sql_result)
         return response
 
+# Department
+# Returns all courses within the given department
+class Department(Resource):
+    def get(self, dept, year, quarter):
+        table_name = database.build_table_name(year, quarter)
+        query = f'SELECT * FROM {table_name} WHERE dept=%s'
+        cursor.execute(query, [dept])
+        sql_result = cursor.fetchall()
+        response = api_utils.build_response(sql_result)
+        return response
+
 # API Routes
 api.add_resource(Course, '/api/course/<int:code>/<int:year>/<string:quarter>')
+api.add_resource(Department, '/api/dept/<string:dept>/<int:year>/<string:quarter>')
 
 if __name__ == '__main__':
     app.run(debug=True)

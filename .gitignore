@@ -3,3 +3,4 @@ venv/
 config.ini
 instructions.txt
 webreg_api/html_files
+secret.txt

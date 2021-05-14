@@ -32,4 +32,4 @@ def setup_database_connection():
     return connection
 
 def build_table_name(year, quarter):
-    return f'{year}_{quarter}_courses'
+    return f'{year}_{quarter}_COURSES'

@@ -12,6 +12,11 @@ api = Api(app)
 connection = database.setup_database_connection()
 cursor = connection.cursor()
 
+# Hello
+class Hello(Resource):
+    def get(self):
+        return {'message': 'Hello world'}
+
 # Course
 # Returns course info of the given course code
 class Course(Resource):
@@ -35,6 +40,7 @@ class Department(Resource):
         return response
 
 # API Routes
+api.add_resource(Hello, '/')
 api.add_resource(Course, '/api/course/<int:code>/<int:year>/<string:quarter>')
 api.add_resource(Department, '/api/dept/<string:dept>/<int:year>/<string:quarter>')
 

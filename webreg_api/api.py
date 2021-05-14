@@ -13,8 +13,8 @@ class Hello(Resource):
     def get(self):
         return {
             'message': 'Make a GET request to any of these endpoints',
-            'Course endpoint': '/api/course/<int:code>/<int:year>/<string:quarter>',
-            'Department endpoint': '/api/dept/<string:dept>/<int:year>/<string:quarter>'
+            'Course endpoint': '/api/course/:code/:year/:quarter',
+            'Department endpoint': '/api/dept/:dept/:year/:quarter'
         }
 
 # Course
@@ -63,4 +63,4 @@ api.add_resource(Course, '/api/course/<int:code>/<int:year>/<string:quarter>')
 api.add_resource(Department, '/api/dept/<string:dept>/<int:year>/<string:quarter>')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

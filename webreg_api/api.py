@@ -1,9 +1,8 @@
 from flask import Flask
 from flask_restful import Resource, Api
-# from webreg_api import database, api_utils
-import database, api_utils
 import pymysql
-from datetime import datetime
+from webreg_api import database, api_utils
+# import database, api_utils
 
 app = Flask(__name__)
 api = Api(app)

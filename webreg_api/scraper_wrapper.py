@@ -26,8 +26,10 @@ Some Dept Parameters Values: (See depts below for full list of Dept Values)
 """
 import requests
 import os
-from scraper import run_scraper
-import database
+# from scraper import run_scraper
+# import database
+from webreg_api.scraper import run_scraper
+from webreg_api import database
 
 BASE_URL = 'https://www.reg.uci.edu/perl/WebSoc/?ShowComments=on&ShowFinals=on&Breadth=ANY&CourseNum=&Division=ANY&CourseCodes=&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room=&Submit=Display+Web+Results'
 CURRENT_YEAR_TERM = '2021-92'

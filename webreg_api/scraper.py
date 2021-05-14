@@ -10,9 +10,9 @@ HEADERS = ['code', 'type', 'sec', 'units', 'instructor', 'time', 'place', 'final
 
 from bs4 import BeautifulSoup
 from collections import defaultdict
-# from webreg_api import database, utils
-import database, utils
 import pymysql
+from webreg_api import database, utils
+# import database, utils
 
 def is_course_title(tr) -> bool:
     '''Returns True if the tr contains the CourseTitle

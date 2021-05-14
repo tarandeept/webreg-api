@@ -1,7 +1,3 @@
-from datetime import datetime
-from datetime import timedelta
-from flask import jsonify
-
 def build_response(sql_result):
     '''Builds response'''
     if sql_result == None:

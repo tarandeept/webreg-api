@@ -45,3 +45,4 @@ api.add_resource(Department, '/api/dept/<string:dept>/<int:year>/<string:quarter
 
 if __name__ == '__main__':
     app.run(debug=True)
+    connection.close()

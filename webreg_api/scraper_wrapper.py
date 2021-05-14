@@ -12,7 +12,7 @@ Of all these parameters, we really only care about YearTerm and Dept
 In order to get HTML content for a different year/quarter and/or different Department, we will need to
 change some of the URL parameters
 
-Once we have the URL configured how we want it, we can GET the HTML file, save it, and run the scraper on it
+Once we have the URL configured how we want it, we can GET the HTML content and run the scraper on it
 
 YearTerm Parameters Values:
 - YEAR-92 (Fall Quarter of the YEAR)
@@ -26,6 +26,8 @@ Some Dept Parameters Values: (See depts below for full list of Dept Values)
 """
 import requests
 import os
+from scraper import run_scraper
+import database
 
 BASE_URL = 'https://www.reg.uci.edu/perl/WebSoc/?YearTerm={YEAR-XX}&ShowComments=on&ShowFinals=on&Breadth=ANY&Dept={DEPT}&CourseNum=&Division=ANY&CourseCodes=&InstrName=&CourseTitle=&ClassType=ALL&Units=&Days=&StartTime=&EndTime=&MaxCap=&FullCourses=ANY&FontSize=100&CancelledCourses=Exclude&Bldg=&Room=&Submit=Display+Web+Results'
 CURRENT_YEAR_TERM = '2021-92'
@@ -55,31 +57,47 @@ DEPTS = ['COMPSCI', 'SOC SCI', 'CHEM']  # Only 3 depts used for testing. Comment
 
 
 def get_dept_courses(dept):
+    '''Gets HTML course content for the given department'''
     url = BASE_URL.replace('{YEAR-XX}', CURRENT_YEAR_TERM)
     url = url.replace('{DEPT}', dept)
     response = requests.get(url)
     html = response.text
     return html
 
-def get_course_files_and_save():
-    base_path = os.getcwd() + f'/webreg_api/html_files/{CURRENT_YEAR}/{CURRENT_QTR}'
-    for dept in DEPTS:
-        file_path = base_path + f'/{dept}.html'
-        with open(file_path, 'w') as file:
-            html = get_dept_courses(dept)
-            file.write(html)
-
-def create_year_quarter_directory():
-    year_path = os.getcwd() + f'/webreg_api/html_files/{CURRENT_YEAR}'
-    quarter_path = year_path + f'/{CURRENT_QTR}'
-    if not os.path.exists(year_path):
-        os.mkdir(year_path)
-    if not os.path.exists(quarter_path):
-        os.mkdir(quarter_path)
-
-
-
+def create_table(year, quarter):
+    '''Creates the year quarter table if it doesn't exist'''
+    connection = database.setup_database_connection()
+    cursor = connection.cursor()
+    sql = f'''CREATE TABLE IF NOT EXISTS `{year}_{quarter}_COURSES` (
+    `code` int(11) NOT NULL,
+    `title` varchar(100) DEFAULT NULL,
+    `name` varchar(100) DEFAULT NULL,
+    `type` enum('Lec','Dis','Lab','Sem','Tut','Res','Stu','Fld') DEFAULT NULL,
+    `sec` varchar(10) DEFAULT NULL,
+    `units` varchar(10) DEFAULT NULL,
+    `instructor` varchar(100) DEFAULT NULL,
+    `days` varchar(20) DEFAULT NULL,
+    `start_time` time DEFAULT NULL,
+    `end_time` time DEFAULT NULL,
+    `place` varchar(100) DEFAULT NULL,
+    `final` varchar(100) DEFAULT NULL,
+    `max` int(11) DEFAULT NULL,
+    `enr` varchar(20) DEFAULT NULL,
+    `wl` varchar(10) DEFAULT NULL,
+    `req` int(11) DEFAULT NULL,
+    `rstr` varchar(20) DEFAULT NULL,
+    `textbooks` varchar(100) DEFAULT NULL,
+    `web` varchar(100) DEFAULT NULL,
+    `status` enum('open','full') DEFAULT NULL,
+    `dept` varchar(50) DEFAULT NULL,
+    PRIMARY KEY (`code`)
+    )'''
+    cursor.execute(sql)
+    connection.commit()
+    connection.close()
 
 if __name__ == '__main__':
-    create_year_quarter_directory()
-    get_course_files_and_save()
+    create_table(CURRENT_YEAR, CURRENT_QTR)
+    for dept in DEPTS:
+        html = get_dept_courses(dept)
+        run_scraper(CURRENT_YEAR, CURRENT_QTR, html, dept)
